@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<meta charset="UTF-8" />
+	<title><ui:insert name="titulo">Portal RH</ui:insert></title>
+	<h:outputStylesheet library="algaworks" name="estilo.css" />
+	<h:outputStylesheet library="webjars" name="/css/font-awesome.min.css" />
+	<h:outputScript library="js" name="scripts.js" />
+	<h:outputScript library="js" name="fecharDialogo.js" />
+</h:head>
+<h:body>
+	<header> </header>
+
+	<div>
+		<p:growl id="messages" showDetail="true" />
+		<p:layout fullPage="true">
+			<div align="center">
+				<p:layoutUnit position="south" size="50" resizable="true"
+					closable="true" collapsible="true">
+
+					<h:outputText value="Grupo Educa - Tecnologia da Informação" />
+					<br></br>
+					<h:outputText value="Versão 1.0.1.1" />
+
+				</p:layoutUnit>
+			</div>
+
+			<p:layoutUnit position="center" style="border:none;">
+
+				<p:dialog header="Autenticação" closable="false" draggable="false"
+					resizable="false" modal="false" visible="true">
+					<h:form id="formAutenticacao">
+						<div align="center">
+
+							<h:panelGrid id="painel" columns="1" class="ui-noborder">
+								<p:outputLabel for="cpf" value="CPF" />
+								<p:inputMask id="cpf" value="#{autenticacaoBean.usuario.cpf}"
+									required="true" requiredMessage="Campo Obrigatório" size="35"
+									mask="999.999.999-99" />
+
+								<p:outputLabel for="senha" value="Senha" />
+								<p:password id="senha" maxlength="100" size="35" required="true"
+									requiredMessage="O campo Senha é obrigatório"
+									value="#{autenticacaoBean.usuario.senha}" />
+							</h:panelGrid>
+
+							<h:panelGrid columns="1">
+								<p:commandButton value="Autenticar" icon="fa fa fw fa-check"
+									update=":formAutenticacao :messages"
+									actionListener="#{autenticacaoBean.autenticar}"
+									onstart="PF('iconeDeProcessamento').show()"
+									onsuccess="PF('iconeDeProcessamento').hide()" />
+							</h:panelGrid>
+
+							<br></br>
+
+							<p:separator />
+							<h:panelGrid columns="1">
+								<p:commandButton value="Não tenho Cadastro"
+									icon="ui-icon-document" oncomplete="PF('dialogoNovo').show()"
+									actionListener="#{autenticacaoBean.iniciarCPF}"
+									update="formNovo:painel"
+									onstart="PF('iconeDeProcessamento').show()"
+									onsuccess="PF('iconeDeProcessamento').hide()" />
+
+								<p:commandButton value="Esqueci minha Senha"
+									icon="fa fa fw fa-key" oncomplete="PF('dialogoSenha').show()"
+									update="formSenha:painel"
+									onstart="PF('iconeDeProcessamento').show()"
+									onsuccess="PF('iconeDeProcessamento').hide()" />
+							</h:panelGrid>
+
+						</div>
+					</h:form>
+				</p:dialog>
+
+			</p:layoutUnit>
+
+			<p:layoutUnit position="north" size="35" style="border:none;"
+				header="Autenticação - Cadastro de Currículo Online"
+				resizable="true" closable="false" collapsible="false">
+			</p:layoutUnit>
+
+		</p:layout>
+	</div>
+
+	<p:dialog widgetVar="iconeDeProcessamento">
+		<f:facet name="header">
+			<h:graphicImage value="/imagens/ampulheta.png" />
+			<h:outputText id="dialogHeader"
+				value="Aguarde... Estamos Processando sua Informação..." />
+		</f:facet>
+	</p:dialog>
+
+	<p:dialog widgetVar="dialogoSenha" header="Esqueci minha Senha"
+		appendTo="@(body)" closable="true" draggable="false" resizable="false"
+		modal="true">
+		<h:form id="formSenha">
+
+			<div align="center">
+
+				<h:panelGrid id="painel" columns="1">
+					<p:outputLabel for="cpf" value="CPF" />
+					<p:inputMask id="cpf" value="#{autenticacaoBean.cpf}"
+						required="true" requiredMessage="Campo Obrigatório" size="25"
+						mask="999.999.999-99" />
+				</h:panelGrid>
+
+				<p:separator />
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Enviar Nova Senha"
+						icon="fa fa fw fa-envelope-o"
+						actionListener="#{autenticacaoBean.enviarNovaSenha}"
+						update="formSenha:painel messages"
+						onstart="PF('iconeDeProcessamento').show()"
+						onsuccess="PF('iconeDeProcessamento').hide()" />
+
+					<p:commandButton value="Cancelar" icon="fa fa-fw fa-close"
+						oncomplete="PF('dialogoSenha').hide();" />
+				</h:panelGrid>
+			</div>
+		</h:form>
+	</p:dialog>
+
+	<p:dialog widgetVar="dialogoNovo" header="Informe o número do CPF"
+		appendTo="@(body)" closable="true" draggable="false" resizable="false"
+		modal="true">
+		<h:form id="formNovo">
+
+			<div align="center">
+
+				<h:panelGrid id="painel" columns="1">
+					<p:outputLabel for="cpf" value="CPF" />
+					<p:inputMask id="cpf" value="#{autenticacaoBean.cpf}"
+						required="true" requiredMessage="Campo Obrigatório" size="25"
+						mask="999.999.999-99" />
+				</h:panelGrid>
+
+				<p:separator />
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Novo" icon="ui-icon-document"
+						actionListener="#{autenticacaoBean.novo}"
+						update=":formNovo:painel :formCadastro :messages"
+						onstart="PF('iconeDeProcessamento').show()"
+						onsuccess="PF('iconeDeProcessamento').hide()" />
+
+					<p:commandButton value="Cancelar" icon="fa fa-fw fa-close"
+						oncomplete="PF('dialogoNovo').hide();" />
+				</h:panelGrid>
+			</div>
+		</h:form>
+	</p:dialog>
+
+	<p:dialog header="Cadastro de Currículos" widgetVar="dialogo"
+		width="1024" height="600" draggable="false" resizable="false"
+		modal="false" closable="true">
+
+		<p:ajax event="close"
+			oncomplete="PF('wiz').loadStep(PF('wiz').cfg.steps [0], true)" />
+
+		<h:form id="formCadastro">
+			<p:layout style="min-width:990px;min-height:580px;">
+
+				<p:layoutUnit position="center" style="border:none;">
+					<p:wizard widgetVar="wiz" style="border:none;" nextLabel="Avançar"
+						backLabel="Voltar">
+						<p:tab title="Dados Pessoais">
+							<br></br>
+
+							<h:panelGrid id="pnDadosPessoais" columns="2" class="ui-noborder">
+
+								<p:outputLabel for="nome" value="Nome" />
+								<p:inputText id="nome" maxlength="100" size="50" required="true"
+									requiredMessage="Campo Obrigatório"
+									value="#{autenticacaoBean.curriculo.nome}" />
+
+								<p:outputLabel for="dataNascimento" value="Data Nascimento" />
+								<p:calendar id="dataNascimento" mask="99/99/99" required="true"
+									showOn="button" requiredMessage="Campo Obrigatório!"
+									yearRange="1900:2222"
+									value="#{autenticacaoBean.curriculo.dataNascimento}" size="12"
+									locale="pt_BR" showButtonPanel="true" navigator="true" />
+
+								<p:outputLabel for="sexo" value="Sexo" />
+								<p:selectOneMenu id="sexo" filter="true"
+									value="#{autenticacaoBean.curriculo.sexo}" required="true"
+									requiredMessage="O campo 'Sexo' é obrigatório"
+									converter="omnifaces.SelectItemsConverter">
+									<f:selectItem noSelectionOption="true"
+										itemLabel="Não Selecionado" />
+									<f:selectItem itemValue="Masculino" itemLabel="Masculino" />
+									<f:selectItem itemValue="Feminino" itemLabel="Feminino" />
+								</p:selectOneMenu>
+
+								<p:outputLabel for="estadoCivil" value="Estado Civil" />
+								<p:selectOneMenu id="estadoCivil" filter="true"
+									value="#{autenticacaoBean.curriculo.estadoCivil}"
+									required="true"
+									requiredMessage="O campo 'Estado Civil' é obrigatório"
+									converter="omnifaces.SelectItemsConverter">
+									<f:selectItem noSelectionOption="true"
+										itemLabel="Não Selecionado" />
+									<f:selectItem itemValue="Solteiro(a)" itemLabel="Solteiro(a)" />
+									<f:selectItem itemValue="Casado(a)" itemLabel="Casado(a)" />
+									<f:selectItem itemValue="Viúvo(a)" itemLabel="Viúvo(a)" />
+								</p:selectOneMenu>
+
+								<p:outputLabel for="escolaridade" value="Escolaridade" />
+								<p:selectOneMenu id="escolaridade" filter="true"
+									value="#{autenticacaoBean.curriculo.escolaridade}"
+									required="true"
+									requiredMessage="O campo 'Escolaridade' é obrigatório"
+									converter="omnifaces.SelectItemsConverter">
+									<f:selectItem noSelectionOption="true"
+										itemLabel="Não Selecionado" />
+									<f:selectItem itemValue="Não Alfabetizado"
+										itemLabel="Não Alfabetizado" />
+									<f:selectItem itemValue="Ensino Fundamental Incompleto"
+										itemLabel="Ensino Fundamental Incompleto" />
+									<f:selectItem itemValue="Ensino Fundamental Completo"
+										itemLabel="Ensino Fundamental Completo" />
+									<f:selectItem itemValue="Ensino Médio Incompleto"
+										itemLabel="Ensino Médio Incompleto" />
+									<f:selectItem itemValue="Ensino Médio Completo"
+										itemLabel="Ensino Médio Completo" />
+									<f:selectItem itemValue="Superior Incompleto"
+										itemLabel="Superior Incompleto" />
+									<f:selectItem itemValue="Superior Completo"
+										itemLabel="Superior Completo" />
+									<f:selectItem itemValue="Pós-Gradução Incompleto"
+										itemLabel="Pós-Gradução Incompleto" />
+									<f:selectItem itemValue="Pós-Gradução Completo"
+										itemLabel="Pós-Gradução Completo" />
+									<f:selectItem itemValue="Mestrado Incompleto"
+										itemLabel="Mestrado Incompleto" />
+									<f:selectItem itemValue="Mestrado Completo"
+										itemLabel="Mestrado Completo" />
+									<f:selectItem itemValue="Doutorado Incompleto"
+										itemLabel="Doutorado Incompleto" />
+									<f:selectItem itemValue="Doutorado Completo"
+										itemLabel="Doutorado Completo" />
+								</p:selectOneMenu>
+
+								<p:outputLabel for="nacionalidade" value="Nacionalidade" />
+								<p:inputText id="nacionalidade" maxlength="100" size="35"
+									required="true" requiredMessage="Campo Obrigatório"
+									value="#{autenticacaoBean.curriculo.nascionalidade}" />
+
+								<p:outputLabel for="naturalidade" value="Naturalidade" />
+								<p:inputText id="naturalidade" maxlength="100" size="35"
+									required="true" requiredMessage="Campo Obrigatório"
+									value="#{autenticacaoBean.curriculo.naturalidade}" />
+
+								<p:outputLabel for="pai" value="Pai" />
+								<p:inputText id="pai" maxlength="100" size="50"
+									value="#{autenticacaoBean.curriculo.pai}" />
+
+								<p:outputLabel for="mae" value="Mãe" />
+								<p:inputText id="mae" maxlength="100" size="50" required="true"
+									requiredMessage="Campo Obrigatório"
+									value="#{autenticacaoBean.curriculo.mae}" />
+
+								<p:outputLabel for="deficiencia" value="Deficiência" />
+								<p:selectOneMenu id="deficiencia" filter="true"
+									value="#{autenticacaoBean.curriculo.deficiencia}"
+									required="true"
+									requiredMessage="O campo 'Deficiência' é obrigatório"
+									converter="omnifaces.SelectItemsConverter">
+									<f:selectItem noSelectionOption="true"
+										itemLabel="Não Selecionado" />
+									<f:selectItem itemValue="Nenhuma" itemLabel="Nenhuma" />
+									<f:selectItem itemValue="Deficiência Física"
+										itemLabel="Deficiência Física" />
+									<f:selectItem itemValue="Deficiência Auditiva"
+										itemLabel="Deficiência Auditiva" />
+									<f:selectItem itemValue="Deficiência Visual"
+										itemLabel="Deficiência Visual" />
+									<f:selectItem itemValue="Deficiência Mental"
+										itemLabel="Deficiência Mental" />
+									<f:selectItem itemValue="Deficiência Múltipla"
+										itemLabel="Deficiência Múltipla" />
+								</p:selectOneMenu>
+							</h:panelGrid>
+						</p:tab>
+
+						<p:tab title="Documentação">
+							<br></br>
+
+							<h:panelGrid id="pnDocumentacao" columns="2" class="ui-noborder">
+
+								<p:outputLabel for="cpf" value="CPF" />
+								<p:inputMask id="cpf" value="#{autenticacaoBean.curriculo.cpf}"
+									required="true" requiredMessage="Campo Obrigatório" size="25"
+									mask="999.999.999-99" />
+
+								<p:outputLabel for="identidade" value="Identidade" />
+								<p:inputText id="identidade" maxlength="40" size="25"
+									required="true" requiredMessage="Campo Obrigatório"
+									value="#{autenticacaoBean.curriculo.identidade}" />
+
+								<p:outputLabel for="identidadeOrgao" value="Orgão Emissor" />
+								<p:inputText id="identidadeOrgao" maxlength="20" size="15"
+									required="true" requiredMessage="Campo Obrigatório"
+									value="#{autenticacaoBean.curriculo.identidadeOrgao}" />
+
+								<p:outputLabel for="ctps" value="CTPS" />
+								<p:inputText id="ctps" maxlength="40" size="25" required="true"
+									requiredMessage="Campo Obrigatório"
+									value="#{autenticacaoBean.curriculo.ctps}" />
+
+								<p:outputLabel for="ctpsSerie" value="CTPS Série" />
+								<p:inputText id="ctpsSerie" maxlength="40" size="25"
+									value="#{autenticacaoBean.curriculo.ctpsSerie}" />
+
+								<p:outputLabel for="carteiraHabilitacao"
+									value="Carteira Habilitação" />
+								<p:inputText id="carteiraHabilitacao" maxlength="40" size="25"
+									value="#{autenticacaoBean.curriculo.carteiraHabilitacao}" />
+
+								<p:outputLabel for="categoria" value="Categoria" />
+								<p:inputText id="categoria" maxlength="40" size="15"
+									value="#{autenticacaoBean.curriculo.carteiraHabilitacaoCategoria}" />
+
+							</h:panelGrid>
+
+						</p:tab>
+
+						<p:tab title="Endereço e Contato">
+							<br></br>
+
+							<h:panelGrid id="pnEnderecoContato" columns="2"
+								class="ui-noborder">
+
+								<p:outputLabel for="endereco" value="Endereço" />
+								<p:inputText id="endereco" maxlength="100" size="60"
+									required="true" requiredMessage="Campo Obrigatório"
+									value="#{autenticacaoBean.curriculo.endereco}" />
+
+								<p:outputLabel for="numero" value="Número" />
+								<p:inputText id="numero" maxlength="10" size="10"
+									required="true" requiredMessage="Campo Obrigatório"
+									value="#{autenticacaoBean.curriculo.numero}" />
+
+								<p:outputLabel for="complemento" value="Complemento" />
+								<p:inputText id="complemento" maxlength="100" size="60"
+									value="#{autenticacaoBean.curriculo.complemento}" />
+
+								<p:outputLabel for="bairro" value="Bairro" />
+								<p:inputText id="bairro" maxlength="60" size="30"
+									required="true" requiredMessage="Campo Obrigatório"
+									value="#{autenticacaoBean.curriculo.bairro}" />
+
+								<p:outputLabel for="cidade" value="Cidade" />
+								<p:inputText id="cidade" maxlength="60" size="30"
+									required="true" requiredMessage="Campo Obrigatório"
+									value="#{autenticacaoBean.curriculo.cidade}" />
+
+								<p:outputLabel for="estado" value="Estado" />
+								<p:inputText id="estado" maxlength="60" size="30"
+									required="true" requiredMessage="Campo Obrigatório"
+									value="#{autenticacaoBean.curriculo.estado}" />
+
+								<p:outputLabel for="pais" value="País" />
+								<p:inputText id="pais" maxlength="60" size="30" required="true"
+									requiredMessage="Campo Obrigatório"
+									value="#{autenticacaoBean.curriculo.pais}" />
+
+								<p:outputLabel for="residencial" value="Fone Residencial" />
+								<p:inputMask id="residencial"
+									value="#{autenticacaoBean.curriculo.foneResidencial}" size="25"
+									mask="(99)99999-9999" />
+
+								<p:outputLabel for="celular1" value="Fone Celular 1" />
+								<p:inputMask id="celular1"
+									value="#{autenticacaoBean.curriculo.foneCelular1}"
+									required="true" requiredMessage="Campo Obrigatório" size="25"
+									mask="(99)99999-9999" />
+
+								<p:outputLabel for="celular2" value="Fone Celular 2" />
+								<p:inputMask id="celular2"
+									value="#{autenticacaoBean.curriculo.foneCelular2}" size="25"
+									mask="(99)99999-9999" />
+
+								<p:outputLabel for="recado" value="Fone Recado" />
+								<p:inputMask id="recado"
+									value="#{autenticacaoBean.curriculo.foneRecado}" size="25"
+									mask="(99)99999-9999" />
+
+								<p:outputLabel for="email" value="E-mail" />
+								<p:inputText id="email" maxlength="100" size="60"
+									required="true" requiredMessage="Campo Obrigatório"
+									value="#{autenticacaoBean.curriculo.email}" />
+
+							</h:panelGrid>
+						</p:tab>
+
+						<p:tab title="Objetivo e Perfil">
+							<br></br>
+
+							<h:panelGrid id="pnObjetivoPerfil" columns="1"
+								class="ui-noborder">
+
+								<p:outputLabel for="objetivo" value="Obejtivo Profissional" />
+								<p:inputTextarea id="objetivo" rows="6" cols="140"
+									required="true" requiredMessage="Campo Obrigatório!"
+									counter="display" maxlength="2000"
+									counterTemplate="{0} caracteres restantes." autoResize="false"
+									value="#{autenticacaoBean.curriculo.objetivoProfissional}" />
+								<h:outputText id="display" />
+
+								<br></br>
+
+								<p:outputLabel for="perfil" value="Perfil Profissional" />
+								<p:inputTextarea id="perfil" rows="6" cols="140" required="true"
+									requiredMessage="Campo Obrigatório!" counter="displayPerfil"
+									maxlength="2000" counterTemplate="{0} caracteres restantes."
+									autoResize="false"
+									value="#{autenticacaoBean.curriculo.perfilProfissional}" />
+								<h:outputText id="displayPerfil" />
+
+							</h:panelGrid>
+						</p:tab>
+
+						<p:tab title="Formação Acadêmica">
+							<br></br>
+
+							<p:toolbar id="toolAcademico">
+								<f:facet name="left">
+									<p:commandButton value="Nova Formação"
+										oncomplete="PF('dialogoFormacaoAcademica').show();"
+										icon="ui-icon-document" update=":formFormacaoAcademica:painel"
+										actionListener="#{autenticacaoBean.novoFormacaoAcademica}">
+										<f:actionListener
+											type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+									</p:commandButton>
+								</f:facet>
+							</p:toolbar>
+
+							<p:dataTable var="curriculoAcademico"
+								emptyMessage="Nenhum registro encontrado."
+								selectionMode="single" rows="10" paginatorPosition="bottom"
+								selection="#{autenticacaoBean.curriculoAcademico}"
+								rowKey="#{curriculoAcademico.codigo}" paginator="true"
+								paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+								rowsPerPageTemplate="5,10,20,30,40,50,100,150,200,250,300,350,400,450,500,1000"
+								id="tabelaFormacaoAcademica"
+								value="#{autenticacaoBean.curriculoAcademicos}">
+
+								<p:ajax event="rowDblselect"
+									listener="#{autenticacaoBean.duploCliqueAcademico}"
+									update="formFormacaoAcademica:painel" />
+
+								<p:column headerText="Curso"
+									sortBy="#{curriculoAcademico.curso}">
+									<h:outputText value="#{curriculoAcademico.curso}" />
+								</p:column>
+
+								<p:column headerText="Instituição"
+									sortBy="#{curriculoAcademico.instituicao}">
+									<h:outputText value="#{curriculoAcademico.instituicao}" />
+								</p:column>
+
+								<p:column headerText="Período Inicial" width="120"
+									style="text-align:center"
+									sortBy="#{curriculoAcademico.dataInicial}">
+									<h:outputText value="#{curriculoAcademico.dataInicial}">
+										<f:convertDateTime locale="pt_BR" pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</p:column>
+
+								<p:column headerText="Período Final" width="120"
+									style="text-align:center"
+									sortBy="#{curriculoAcademico.dataFinal}">
+									<h:outputText value="#{curriculoAcademico.dataFinal}">
+										<f:convertDateTime locale="pt_BR" pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</p:column>
+
+								<p:column headerText="Opções" width="70"
+									style="text-align:center">
+
+									<p:commandButton title="Editar"
+										actionListener="#{autenticacaoBean.editarCurriculoAcademico}"
+										update="formFormacaoAcademica:painel"
+										onstart="PF('iconeDeProcessamento').show()"
+										onsuccess="PF('iconeDeProcessamento').hide()"
+										icon="fa fa-fw fa-edit"
+										oncomplete="PF('dialogoFormacaoAcademica').show();">
+										<f:attribute name="curriculoAcademicoSelecionado"
+											value="#{curriculoAcademico}" />
+										<f:actionListener
+											type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+									</p:commandButton>
+
+									<p:commandButton title="Excluir" icon="ui-icon-trash"
+										actionListener="#{autenticacaoBean.excluirCurriculoAcademico}"
+										update=":formCadastro:tabelaFormacaoAcademica :messages"
+										onstart="PF('iconeDeProcessamento').show()"
+										onsuccess="PF('iconeDeProcessamento').hide()">
+										<f:attribute name="curriculoAcademicoSelecionado"
+											value="#{curriculoAcademico}" />
+										<p:confirm header="Confirmação"
+											message="Deseja Excluir este Registro?" icon="ui-icon-alert" />
+									</p:commandButton>
+
+								</p:column>
+
+							</p:dataTable>
+						</p:tab>
+
+						<p:tab title="Cursos">
+							<br></br>
+
+							<p:toolbar id="toolCurso">
+								<f:facet name="left">
+									<p:commandButton value="Novo Curso"
+										oncomplete="PF('dialogoCurso').show();"
+										icon="ui-icon-document" update=":formCurso:painel"
+										actionListener="#{autenticacaoBean.novoCurso}">
+										<f:actionListener
+											type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+									</p:commandButton>
+								</f:facet>
+							</p:toolbar>
+
+							<p:dataTable var="curriculoCurso"
+								emptyMessage="Nenhum registro encontrado."
+								selectionMode="single" rows="10" paginatorPosition="bottom"
+								selection="#{autenticacaoBean.curriculoCurso}"
+								rowKey="#{curriculoCurso.codigo}" paginator="true"
+								paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+								rowsPerPageTemplate="5,10,20,30,40,50,100,150,200,250,300,350,400,450,500,1000"
+								id="tabelaCurso" value="#{autenticacaoBean.curriculoCursos}">
+
+								<p:ajax event="rowDblselect"
+									listener="#{autenticacaoBean.duploCliqueCurso}"
+									update="formCurso:painel" />
+
+								<p:column headerText="Curso" sortBy="#{curriculoCurso.curso}">
+									<h:outputText value="#{curriculoCurso.curso}" />
+								</p:column>
+
+								<p:column headerText="Instituição"
+									sortBy="#{curriculoCurso.instituicao}">
+									<h:outputText value="#{curriculoCurso.instituicao}" />
+								</p:column>
+
+								<p:column headerText="Período Inicial" width="120"
+									style="text-align:center"
+									sortBy="#{curriculoCurso.dataInicial}">
+									<h:outputText value="#{curriculoCurso.dataInicial}">
+										<f:convertDateTime locale="pt_BR" pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</p:column>
+
+								<p:column headerText="Período Final" width="120"
+									style="text-align:center" sortBy="#{curriculoCurso.dataFinal}">
+									<h:outputText value="#{curriculoCurso.dataFinal}">
+										<f:convertDateTime locale="pt_BR" pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</p:column>
+
+								<p:column headerText="Opções" width="70"
+									style="text-align:center">
+
+									<p:commandButton title="Editar"
+										actionListener="#{autenticacaoBean.editarCurriculoCurso}"
+										update="formCurso:painel"
+										onstart="PF('iconeDeProcessamento').show()"
+										onsuccess="PF('iconeDeProcessamento').hide()"
+										icon="fa fa-fw fa-edit"
+										oncomplete="PF('dialogoCurso').show();">
+										<f:attribute name="curriculoCursoSelecionado"
+											value="#{curriculoCurso}" />
+										<f:actionListener
+											type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+									</p:commandButton>
+
+									<p:commandButton title="Excluir" icon="ui-icon-trash"
+										actionListener="#{autenticacaoBean.excluirCurriculoCurso}"
+										update=":formCadastro:tabelaCurso :messages"
+										onstart="PF('iconeDeProcessamento').show()"
+										onsuccess="PF('iconeDeProcessamento').hide()">
+										<f:attribute name="curriculoCursoSelecionado"
+											value="#{curriculoCurso}" />
+										<p:confirm header="Confirmação"
+											message="Deseja Excluir este Registro?" icon="ui-icon-alert" />
+									</p:commandButton>
+
+								</p:column>
+
+							</p:dataTable>
+
+
+						</p:tab>
+
+						<p:tab title="Experiências Profissionais">
+							<br></br>
+
+							<p:toolbar id="toolProfissional">
+								<f:facet name="left">
+									<p:commandButton value="Nova Experiência"
+										oncomplete="PF('dialogoProfissional').show();"
+										icon="ui-icon-document" update=":formProfissional:painel"
+										actionListener="#{autenticacaoBean.novoProfissional}">
+										<f:actionListener
+											type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+									</p:commandButton>
+								</f:facet>
+							</p:toolbar>
+
+							<p:dataTable var="curriculoProfissional"
+								emptyMessage="Nenhum registro encontrado."
+								selectionMode="single" rows="10" paginatorPosition="bottom"
+								selection="#{autenticacaoBean.curriculoProfissional}"
+								rowKey="#{curriculoProfissional.codigo}" paginator="true"
+								paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+								rowsPerPageTemplate="5,10,20,30,40,50,100,150,200,250,300,350,400,450,500,1000"
+								id="tabelaProfissional"
+								value="#{autenticacaoBean.curriculoProfissionais}">
+
+								<p:ajax event="rowDblselect"
+									listener="#{autenticacaoBean.duploCliqueProfissional}"
+									update="formProfissional:painel" />
+
+								<p:column headerText="Empresa"
+									sortBy="#{curriculoProfissional.empresa}">
+									<h:outputText value="#{curriculoProfissional.empresa}" />
+								</p:column>
+
+								<p:column headerText="Cargo"
+									sortBy="#{curriculoProfissional.cargo}">
+									<h:outputText value="#{curriculoProfissional.cargo}" />
+								</p:column>
+
+								<p:column headerText="Período Inicial" width="120"
+									style="text-align:center"
+									sortBy="#{curriculoProfissional.dataInicial}">
+									<h:outputText value="#{curriculoProfissional.dataInicial}">
+										<f:convertDateTime locale="pt_BR" pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</p:column>
+
+								<p:column headerText="Período Final" width="120"
+									style="text-align:center"
+									sortBy="#{curriculoProfissional.dataFinal}">
+									<h:outputText value="#{curriculoProfissional.dataFinal}">
+										<f:convertDateTime locale="pt_BR" pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</p:column>
+
+								<p:column headerText="Opções" width="70"
+									style="text-align:center">
+
+									<p:commandButton title="Editar"
+										actionListener="#{autenticacaoBean.editarCurriculoProfissional}"
+										update="formProfissional:painel"
+										onstart="PF('iconeDeProcessamento').show()"
+										onsuccess="PF('iconeDeProcessamento').hide()"
+										icon="fa fa-fw fa-edit"
+										oncomplete="PF('dialogoProfissional').show();">
+										<f:attribute name="curriculoProfissionalSelecionado"
+											value="#{curriculoProfissional}" />
+										<f:actionListener
+											type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+									</p:commandButton>
+
+									<p:commandButton title="Excluir" icon="ui-icon-trash"
+										actionListener="#{autenticacaoBean.excluirCurriculoProfissional}"
+										update=":formCadastro:tabelaProfissional :messages"
+										onstart="PF('iconeDeProcessamento').show()"
+										onsuccess="PF('iconeDeProcessamento').hide()">
+										<f:attribute name="curriculoProfissionalSelecionado"
+											value="#{curriculoProfissional}" />
+										<p:confirm header="Confirmação"
+											message="Deseja Excluir este Registro?" icon="ui-icon-alert" />
+									</p:commandButton>
+
+								</p:column>
+
+							</p:dataTable>
+						</p:tab>
+
+						<p:tab title="Referências Pessoais">
+							<br></br>
+
+							<p:toolbar id="toolPessoal">
+								<f:facet name="left">
+									<p:commandButton value="Nova Referência"
+										oncomplete="PF('dialogoPessoal').show();"
+										icon="ui-icon-document" update=":formPessoal:painel"
+										actionListener="#{autenticacaoBean.novoPessoal}">
+										<f:actionListener
+											type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+									</p:commandButton>
+								</f:facet>
+							</p:toolbar>
+
+							<p:dataTable var="curriculoPessoal"
+								emptyMessage="Nenhum registro encontrado."
+								selectionMode="single" rows="10" paginatorPosition="bottom"
+								selection="#{autenticacaoBean.curriculoPessoal}"
+								rowKey="#{curriculoPessoal.codigo}" paginator="true"
+								paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+								rowsPerPageTemplate="5,10,20,30,40,50,100,150,200,250,300,350,400,450,500,1000"
+								id="tabelaPessoal" value="#{autenticacaoBean.curriculoPessoais}">
+
+								<p:ajax event="rowDblselect"
+									listener="#{autenticacaoBean.duploCliquePessoal}"
+									update="formPessoal:painel" />
+
+								<p:column headerText="Nome" sortBy="#{curriculoPessoal.nome}">
+									<h:outputText value="#{curriculoPessoal.nome}" />
+								</p:column>
+
+								<p:column headerText="Grau Parentesco" width="180"
+									style="text-align:center"
+									sortBy="#{curriculoPessoal.grauParentesco}">
+									<h:outputText value="#{curriculoPessoal.grauParentesco}" />
+								</p:column>
+
+								<p:column headerText="Contato" width="120"
+									style="text-align:center" sortBy="#{curriculoPessoal.fone}">
+									<h:outputText value="#{curriculoPessoal.fone}" />
+								</p:column>
+
+								<p:column headerText="Opções" width="70"
+									style="text-align:center">
+
+									<p:commandButton title="Editar"
+										actionListener="#{autenticacaoBean.editarCurriculoPessoal}"
+										update="formPessoal:painel"
+										onstart="PF('iconeDeProcessamento').show()"
+										onsuccess="PF('iconeDeProcessamento').hide()"
+										icon="fa fa-fw fa-edit"
+										oncomplete="PF('dialogoPessoal').show();">
+										<f:attribute name="curriculoPessoalSelecionado"
+											value="#{curriculoPessoal}" />
+										<f:actionListener
+											type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+									</p:commandButton>
+
+									<p:commandButton title="Excluir" icon="ui-icon-trash"
+										actionListener="#{autenticacaoBean.excluirCurriculoPessoal}"
+										update=":formCadastro:tabelaPessoal :messages"
+										onstart="PF('iconeDeProcessamento').show()"
+										onsuccess="PF('iconeDeProcessamento').hide()">
+										<f:attribute name="curriculoPessoalSelecionado"
+											value="#{curriculoPessoal}" />
+										<p:confirm header="Confirmação"
+											message="Deseja Excluir este Registro?" icon="ui-icon-alert" />
+									</p:commandButton>
+
+								</p:column>
+
+							</p:dataTable>
+						</p:tab>
+
+						<p:tab title="Informações Adicionais">
+							<br></br>
+							<h:panelGrid id="pnInformacaoAdicional" columns="1"
+								class="ui-noborder">
+
+								<p:outputLabel for="adicional" value="Informações Adicionais" />
+								<p:inputTextarea id="adicional" rows="12" cols="140"
+									counter="displayAdicional" maxlength="2000"
+									counterTemplate="{0} caracteres restantes." autoResize="false"
+									value="#{autenticacaoBean.curriculo.informacaoAdicional}" />
+								<h:outputText id="displayAdicional" />
+							</h:panelGrid>
+
+							<h:panelGrid columns="3">
+								<p:commandButton value="Salvar Currículo" icon="ui-icon-disk"
+									style="margin:0 0px 0 732px"
+									actionListener="#{autenticacaoBean.salvar}"
+									update=":formAutenticacao:cpf :messages"
+									onstart="PF('iconeDeProcessamento').show()"
+									onsuccess="PF('iconeDeProcessamento').hide()">
+									<p:confirm header="Confirmação"
+										message="Deseja Salvar este Currículo?" icon="ui-icon-alert" />
+								</p:commandButton>
+							</h:panelGrid>
+						</p:tab>
+
+					</p:wizard>
+
+				</p:layoutUnit>
+
+				<p:layoutUnit position="south" size="60" style="border:none;"
+					resizable="true" closable="true" collapsible="true">
+
+					<p:separator />
+
+					<h:panelGrid columns="3">
+						<p:commandButton value="Fechar" icon="fa fa-fw fa-close"
+							oncomplete="PF('dialogo').hide();" />
+					</h:panelGrid>
+
+				</p:layoutUnit>
+
+			</p:layout>
+		</h:form>
+
+	</p:dialog>
+
+	<p:dialog header="Formação Acadêmica" modal="true" appendTo="@(body)"
+		widgetVar="dialogoFormacaoAcademica" draggable="false"
+		resizable="false" closable="true">
+		<h:form id="formFormacaoAcademica">
+
+			<h:panelGrid id="painel" columns="2" class="ui-noborder">
+
+				<p:outputLabel for="curso" value="Curso" />
+				<p:inputText id="curso" maxlength="100" size="50" required="true"
+					requiredMessage="Campo Obrigatório"
+					value="#{autenticacaoBean.curriculoAcademico.curso}" />
+
+				<p:outputLabel for="instituicao" value="Instituição" />
+				<p:inputText id="instituicao" maxlength="100" size="50"
+					required="true" requiredMessage="Campo Obrigatório"
+					value="#{autenticacaoBean.curriculoAcademico.instituicao}" />
+
+				<p:outputLabel for="periodoInicial" value="Período Inicial" />
+				<p:calendar id="periodoInicial" mask="99/99/99" required="true"
+					showOn="button" requiredMessage="Campo Obrigatório!"
+					yearRange="1900:2222"
+					value="#{autenticacaoBean.curriculoAcademico.dataInicial}"
+					size="12" locale="pt_BR" showButtonPanel="true" navigator="true" />
+
+				<p:outputLabel for="periodoFinal" value="Período Final" />
+				<p:calendar id="periodoFinal" mask="99/99/99" yearRange="1900:2222"
+					showOn="button"
+					value="#{autenticacaoBean.curriculoAcademico.dataFinal}" size="12"
+					locale="pt_BR" showButtonPanel="true" navigator="true" />
+
+			</h:panelGrid>
+
+			<p:separator />
+
+			<h:panelGrid columns="3">
+				<p:commandButton value="Salvar" icon="ui-icon-disk"
+					actionListener="#{autenticacaoBean.salvarCurriculoAcademico}"
+					update=":formFormacaoAcademica:painel formCadastro:tabelaFormacaoAcademica :messages"
+					onstart="PF('iconeDeProcessamento').show()"
+					onsuccess="PF('iconeDeProcessamento').hide()" />
+
+				<p:commandButton value="Fechar" icon="fa fa-fw fa-close"
+					oncomplete="PF('dialogoFormacaoAcademica').hide();" />
+			</h:panelGrid>
+
+		</h:form>
+	</p:dialog>
+
+	<p:dialog header="Cursos" widgetVar="dialogoCurso" draggable="false"
+		modal="true" appendTo="@(body)" resizable="false" closable="true">
+		<h:form id="formCurso">
+
+			<h:panelGrid id="painel" columns="2" class="ui-noborder">
+
+				<p:outputLabel for="curso" value="Curso" />
+				<p:inputText id="curso" maxlength="100" size="50" required="true"
+					requiredMessage="Campo Obrigatório"
+					value="#{autenticacaoBean.curriculoCurso.curso}" />
+
+				<p:outputLabel for="instituicao" value="Instituição" />
+				<p:inputText id="instituicao" maxlength="100" size="50"
+					required="true" requiredMessage="Campo Obrigatório"
+					value="#{autenticacaoBean.curriculoCurso.instituicao}" />
+
+				<p:outputLabel for="periodoInicial" value="Período Inicial" />
+				<p:calendar id="periodoInicial" mask="99/99/99" required="true"
+					showOn="button" requiredMessage="Campo Obrigatório!"
+					yearRange="1900:2222"
+					value="#{autenticacaoBean.curriculoCurso.dataInicial}" size="12"
+					locale="pt_BR" showButtonPanel="true" navigator="true" />
+
+				<p:outputLabel for="periodoFinal" value="Período Final" />
+				<p:calendar id="periodoFinal" mask="99/99/99" yearRange="1900:2222"
+					showOn="button"
+					value="#{autenticacaoBean.curriculoCurso.dataFinal}" size="12"
+					locale="pt_BR" showButtonPanel="true" navigator="true" />
+
+			</h:panelGrid>
+
+			<p:separator />
+
+			<h:panelGrid columns="3">
+				<p:commandButton value="Salvar" icon="ui-icon-disk"
+					actionListener="#{autenticacaoBean.salvarCurriculoCurso}"
+					update=":formCurso:painel formCadastro:tabelaCurso :messages"
+					onstart="PF('iconeDeProcessamento').show()"
+					onsuccess="PF('iconeDeProcessamento').hide()" />
+
+				<p:commandButton value="Fechar" icon="fa fa-fw fa-close"
+					oncomplete="PF('dialogoCurso').hide();" />
+			</h:panelGrid>
+
+		</h:form>
+	</p:dialog>
+
+	<p:dialog header="Experiências Profissionais"
+		widgetVar="dialogoProfissional" draggable="false" modal="true"
+		appendTo="@(body)" resizable="false" closable="true">
+		<h:form id="formProfissional">
+
+			<h:panelGrid id="painel" columns="2" class="ui-noborder">
+
+				<p:outputLabel for="empresa" value="Empresa" />
+				<p:inputText id="empresa" maxlength="100" size="50" required="true"
+					requiredMessage="Campo Obrigatório"
+					value="#{autenticacaoBean.curriculoProfissional.empresa}" />
+
+				<p:outputLabel for="cargo" value="Cargo" />
+				<p:inputText id="cargo" maxlength="100" size="50" required="true"
+					requiredMessage="Campo Obrigatório"
+					value="#{autenticacaoBean.curriculoProfissional.cargo}" />
+
+				<p:outputLabel for="periodoInicial" value="Período Inicial" />
+				<p:calendar id="periodoInicial" mask="99/99/99" required="true"
+					showOn="button" requiredMessage="Campo Obrigatório!"
+					yearRange="1900:2222"
+					value="#{autenticacaoBean.curriculoProfissional.dataInicial}"
+					size="12" locale="pt_BR" showButtonPanel="true" navigator="true" />
+
+				<p:outputLabel for="periodoFinal" value="Período Final" />
+				<p:calendar id="periodoFinal" mask="99/99/99" yearRange="1900:2222"
+					showOn="button"
+					value="#{autenticacaoBean.curriculoProfissional.dataFinal}"
+					size="12" locale="pt_BR" showButtonPanel="true" navigator="true" />
+
+			</h:panelGrid>
+
+			<p:separator />
+
+			<h:panelGrid columns="3">
+				<p:commandButton value="Salvar" icon="ui-icon-disk"
+					actionListener="#{autenticacaoBean.salvarCurriculoProfissional}"
+					update=":formProfissional:painel formCadastro:tabelaProfissional :messages"
+					onstart="PF('iconeDeProcessamento').show()"
+					onsuccess="PF('iconeDeProcessamento').hide()" />
+
+				<p:commandButton value="Fechar" icon="fa fa-fw fa-close"
+					oncomplete="PF('dialogoProfissional').hide();" />
+			</h:panelGrid>
+
+		</h:form>
+	</p:dialog>
+
+	<p:dialog header="Referências Pessoais" widgetVar="dialogoPessoal"
+		draggable="false" modal="true" appendTo="@(body)" resizable="false"
+		closable="true">
+		<h:form id="formPessoal">
+
+			<h:panelGrid id="painel" columns="2" class="ui-noborder">
+
+				<p:outputLabel for="nome" value="Nome" />
+				<p:inputText id="nome" maxlength="100" size="50" required="true"
+					requiredMessage="Campo Obrigatório"
+					value="#{autenticacaoBean.curriculoPessoal.nome}" />
+
+				<p:outputLabel for="fone" value="Fone" />
+				<p:inputMask id="fone"
+					value="#{autenticacaoBean.curriculoPessoal.fone}" size="25"
+					mask="(99)99999-9999" />
+
+				<p:outputLabel for="grau" value="Grau Parentesco" />
+				<p:selectOneMenu id="grau" filter="true"
+					value="#{autenticacaoBean.curriculoPessoal.grauParentesco}"
+					required="true"
+					requiredMessage="O campo 'Grau Parentesco' é obrigatório"
+					converter="omnifaces.SelectItemsConverter">
+					<f:selectItem noSelectionOption="true" itemLabel="Não Selecionado" />
+
+					<f:selectItem itemValue="Amigo(a)" itemLabel="Amigo(a)" />
+					<f:selectItem itemValue="Avó" itemLabel="Avó" />
+					<f:selectItem itemValue="Avô" itemLabel="Avô" />
+					<f:selectItem itemValue="Cunhado(a)" itemLabel="Cunhado(a)" />
+					<f:selectItem itemValue="Genro" itemLabel="Genro" />
+					<f:selectItem itemValue="Irmão(a)" itemLabel="Irmão(a)" />
+					<f:selectItem itemValue="Mãe" itemLabel="Mãe" />
+					<f:selectItem itemValue="Nora" itemLabel="Nora" />
+					<f:selectItem itemValue="Pai" itemLabel="Pai" />
+					<f:selectItem itemValue="Primo(a)" itemLabel="Primo(a)" />
+					<f:selectItem itemValue="Sogra(a)" itemLabel="Sogra(a)" />
+					<f:selectItem itemValue="Tio(a)" itemLabel="Tio(a)" />
+					<f:selectItem itemValue="Outros" itemLabel="Outros" />
+				</p:selectOneMenu>
+
+			</h:panelGrid>
+
+			<p:separator />
+
+			<h:panelGrid columns="3">
+				<p:commandButton value="Salvar" icon="ui-icon-disk"
+					actionListener="#{autenticacaoBean.salvarCurriculoPessoal}"
+					update=":formPessoal:painel formCadastro:tabelaPessoal :messages"
+					onstart="PF('iconeDeProcessamento').show()"
+					onsuccess="PF('iconeDeProcessamento').hide()" />
+
+				<p:commandButton value="Fechar" icon="fa fa-fw fa-close"
+					oncomplete="PF('dialogoPessoal').hide();" />
+			</h:panelGrid>
+
+			<p:confirmDialog global="true">
+				<p:commandButton value="Sim" type="button"
+					styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+				<p:commandButton value="Não" type="button"
+					styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			</p:confirmDialog>
+
+		</h:form>
+	</p:dialog>
+</h:body>
+</html>

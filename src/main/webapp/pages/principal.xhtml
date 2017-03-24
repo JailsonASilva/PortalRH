@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<meta charset="UTF-8" />
+	<title><ui:insert name="titulo">Portal - Recrutamento e Seleção</ui:insert></title>
+	<h:outputStylesheet library="algaworks" name="estilo.css" />
+	<h:outputStylesheet library="webjars" name="/css/font-awesome.min.css" />
+	<h:outputScript library="js" name="scripts.js" />
+	<h:outputScript library="js" name="fecharDialogo.js" />
+</h:head>
+<h:body>
+	<header> </header>
+
+	<div>
+		<p:growl id="messages" showDetail="true" />
+		<p:layout fullPage="true">
+			<div align="center">
+				<p:layoutUnit position="south" size="50" resizable="true"
+					closable="true" collapsible="true">
+
+					<h:outputText value="Grupo Educa - Tecnologia da Informação" />
+					<br></br>
+					<h:outputText value="Versão 1.0.1.1" />
+
+				</p:layoutUnit>
+			</div>
+
+			<p:layoutUnit position="west" resizable="true" size="190"
+				style="border:none;">
+				<h:form>
+					<p:menu style="width:170px">
+						<p:submenu label="Menu">
+							<p:menuitem value="Vagas Disponíveis" icon="ui-icon-calculator"
+								title="Consultar e candidata-se a vagas disponíveis" />
+
+							<p:menuitem value="Comunicar um Amigo" icon="ui-icon-mail-closed"
+								title="Enviar uma vaga para um amigo" />
+
+							<p:menuitem value="Acompanhar Seleção"
+								title="Acompanhar como esta seu andamento no processo de seleção"
+								icon="ui-icon-transfer-e-w" />
+
+							<p:menuitem value="Alterar meus Dados" icon="ui-icon-person"
+								title="Alterar dados do seu currículo"
+								url="/pages/curriculo.xhtml" />
+
+							<p:menuitem value="Fale Conosco" icon="ui-icon-mail-closed"
+								title="Enviar e-mail para RH" url="/pages/faleConosco.xhtml" />
+
+							<p:separator></p:separator>
+
+							<p:menuitem value="Trocar de Senha" icon="ui-icon-key"
+								url="/pages/trocarSenha.xhtml" />
+
+							<p:menuitem value="Sair da Minha Conta" icon="ui-icon-power"
+								actionListener="#{autenticacaoBean.desconectar}" />
+						</p:submenu>
+					</p:menu>
+				</h:form>
+			</p:layoutUnit>
+
+			<p:layoutUnit position="center" style="border:none;">
+				<div id="conteudo">
+					<ui:insert name="conteudo"></ui:insert>
+				</div>
+			</p:layoutUnit>
+
+			<p:layoutUnit position="north" size="35" style="border:none;"
+				header="Seja Bem-Vindo ao Sistema de Recrutamento e Seleção Facema"
+				resizable="true" closable="false" collapsible="false">
+			</p:layoutUnit>
+
+		</p:layout>
+	</div>
+
+	<p:dialog widgetVar="iconeDeProcessamento">
+		<f:facet name="header">
+			<h:graphicImage value="/imagens/ampulheta.png" />
+			<h:outputText id="dialogHeader"
+				value="Aguarde... Estamos Processando sua Informação..." />
+		</f:facet>
+	</p:dialog>
+
+
+	<br></br>
+</h:body>
+</html>
