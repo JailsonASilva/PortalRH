@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	template="/pages/principal.xhtml">
+
+	<ui:define name="conteudo">
+		<h:form id="formListagem">
+			<p:panel header="Acompanhar Seleção">
+
+				<p:growl id="messages" showDetail="true" />
+				<p:toolbar id="tool">
+					<f:facet name="left">
+
+						<p:commandButton value="Detalhes da Seleção"
+							disabled="#{acompanhamentoBean.curriculoVaga == null}"
+							update=":formSelecao :formSelecao:painel"
+							oncomplete="PF('dialogo').show()" icon="ui-icon-contact">
+							<f:actionListener
+								type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+						</p:commandButton>
+
+						<p:separator></p:separator>
+
+						<p:commandButton value="Cancelar Inscrição"
+							disabled="#{acompanhamentoBean.curriculoVaga == null}"
+							update=":formSelecao :formSelecao:painel"
+							oncomplete="PF('dialogo').show()" icon="fa fa-fw fa-close">
+							<f:actionListener
+								type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+						</p:commandButton>
+					</f:facet>
+				</p:toolbar>
+
+				<p:dataTable id="tabela"
+					emptyMessage="Você não está participando de nenhuma Seleção no momento."
+					selectionMode="single"
+					selection="#{acompanhamentoBean.curriculoVaga}"
+					draggableColumns="true" resizableColumns="true"
+					rowKey="#{curriculoVaga.codigo}" paginator="true"
+					rowsPerPageTemplate="5,10,20,30,40,50,100,150,200,250,300,350,400,450,500,1000"
+					value="#{acompanhamentoBean.curriculoVagas}"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					var="curriculoVaga" rows="10" paginatorPosition="bottom">
+
+					<p:ajax event="rowDblselect"
+						listener="#{acompanhamentoBean.duploClique}"
+						update=":formSelecao :formSelecao:painel" />
+
+					<p:ajax event="rowUnselect"
+						update=":formListagem:messages :formListagem:tool"
+						listener="#{acompanhamentoBean.onRowUnselect}" />
+
+					<p:ajax event="rowSelect"
+						update=":formListagem:messages :formListagem:tool"
+						listener="#{acompanhamentoBean.onRowSelect}" />
+
+					<p:column headerText="Vaga"
+						sortBy="#{curriculoVaga.vagaPerfil.perfil.nome}" width="150">
+						<h:outputText value="#{curriculoVaga.vagaPerfil.perfil.nome}" />
+					</p:column>
+
+					<p:column headerText="Etapa" sortBy="#{curriculoVaga.etapa.nome}"
+						style="text-align:center" width="150">
+						<h:outputText value="#{curriculoVaga.etapa.nome}" />
+					</p:column>
+
+					<p:column headerText="Previsão Resultado" width="74"
+						style="text-align:center" sortBy="#{curriculoVaga.dataResultado}">
+						<h:outputText value="#{curriculoVaga.dataResultado}">
+							<f:convertDateTime locale="pt_BR" pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="Status" sortBy="#{curriculoVaga.status}"
+						style="text-align:center" width="65">
+						<h:outputText value="#{curriculoVaga.status}" />
+					</p:column>
+
+				</p:dataTable>
+			</p:panel>
+
+			<p:confirmDialog global="true">
+				<p:commandButton value="Sim" type="button"
+					styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+				<p:commandButton value="Não" type="button"
+					styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			</p:confirmDialog>
+		</h:form>
+
+		<p:dialog header="Detalhe da Seleção" widgetVar="dialogo" width="800"
+			height="600" draggable="false" resizable="false" closable="true">
+			<h:form id="formSelecao">
+
+				<p:accordionPanel id="painel">
+
+					<p:tab title="Detalhes da Seleção">
+						<h:panelGrid columns="1">
+							<h:outputText
+								value="Etapa: #{acompanhamentoBean.curriculoVaga.etapa.nome}" />
+
+							<h:outputText
+								value="Status: #{acompanhamentoBean.curriculoVaga.status}" />
+
+							<br></br>
+
+							<h:outputText
+								value="Período Inicial: #{acompanhamentoBean.curriculoVaga.dataInicialFormatada}" />
+
+							<h:outputText
+								value="Período Final: #{acompanhamentoBean.curriculoVaga.dataFinalFormatada}" />
+
+							<h:outputText
+								value="Previsão do Resultado: #{acompanhamentoBean.curriculoVaga.dataResultadoFormatada}" />
+
+							<br></br>
+
+							<h:outputText
+								value="Retorno do RH: #{acompanhamentoBean.curriculoVaga.retornoRH}" />
+						</h:panelGrid>
+					</p:tab>
+
+					<p:tab title="Detalhes da Vaga">
+						<h:panelGrid columns="1">
+							<h:outputText
+								value="Descrição: #{acompanhamentoBean.curriculoVaga.vagaPerfil.perfil.nome}" />
+
+							<h:outputText
+								value="Nº de Vagas: #{acompanhamentoBean.curriculoVaga.vagaPerfil.quantidadeVagaFormatada}" />
+
+							<h:outputText
+								value="Renumeração: #{acompanhamentoBean.curriculoVaga.vagaPerfil.renumeracaoFormatada}">
+								<f:convertNumber locale="pt_BR" minFractionDigits="2" />
+							</h:outputText>
+
+						</h:panelGrid>
+					</p:tab>
+
+					<p:tab title="Função">
+						<h:outputText
+							value="#{acompanhamentoBean.curriculoVaga.vagaPerfil.funcao}" />
+					</p:tab>
+
+					<p:tab title="Requisitos">
+						<h:outputText
+							value="#{acompanhamentoBean.curriculoVaga.vagaPerfil.requisitos}" />
+					</p:tab>
+
+					<p:tab title="Conhecimentos Desejáveis">
+						<h:outputText
+							value="#{acompanhamentoBean.curriculoVaga.vagaPerfil.desejavel}" />
+					</p:tab>
+
+				</p:accordionPanel>
+
+				<br></br>
+				<p:separator />
+
+				<h:panelGrid columns="3">
+					<p:commandButton value="Cancelar Inscrição" icon="ui-icon-disk"
+						actionListener="#{acompanhamentoBean.cancelar}"
+						onstart="PF('iconeDeProcessamento').show()"
+						onsuccess="PF('iconeDeProcessamento').hide()"
+						update=":formListagem:tabela :formListagem:messages">
+
+						<p:confirm header="Confirmação"
+							message="Deseja Cancelar esta Seleção? Se clicar em sim você deixar de concorrer a esta Vaga. Deseja relamente Continuar?"
+							icon="ui-icon-alert" />
+					</p:commandButton>
+
+					<p:commandButton value="Fechar" icon="fa fa-fw fa-close"
+						oncomplete="PF('dialogo').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+	</ui:define>
+</ui:composition>

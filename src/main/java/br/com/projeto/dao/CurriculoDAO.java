@@ -79,8 +79,9 @@ public class CurriculoDAO extends GenericDAO<Curriculo> {
 		try {
 			Criteria consulta = sessao.createCriteria(Curriculo.class);
 
-			cpf = cpf.substring(0, 3) + "." + cpf.substring(3, 6) + "." + cpf.substring(6, 9) + "-" + cpf.substring(9, 11);
-			
+			cpf = cpf.substring(0, 3) + "." + cpf.substring(3, 6) + "." + cpf.substring(6, 9) + "-"
+					+ cpf.substring(9, 11);
+
 			consulta.add(Restrictions.eq("cpf", cpf));
 
 			List<Curriculo> resultado = consulta.list();
@@ -90,6 +91,40 @@ public class CurriculoDAO extends GenericDAO<Curriculo> {
 			} else {
 				return false;
 			}
+
+		} catch (RuntimeException erro) {
+			throw erro;
+		} finally {
+			sessao.close();
+		}
+	}
+
+	public Curriculo localizarCurriculo(String cpf) {
+		Session sessao = HibernateUtil.getFabricaDeSessoes().openSession();
+
+		try {
+			Criteria consulta = sessao.createCriteria(Curriculo.class);
+
+			consulta.add(Restrictions.eq("cpf", cpf));
+
+			Curriculo resultado = (Curriculo) consulta.uniqueResult();
+
+			return resultado;
+
+		} catch (RuntimeException erro) {
+			throw erro;
+		} finally {
+			sessao.close();
+		}
+	}
+
+	public Long proximoID() {
+		Session sessao = HibernateUtil.getFabricaDeSessoes().openSession();
+		
+		try {
+			Long id = (Long) sessao.createSQLQuery("SELECT MAX(next_val) AS proximoID FROM hibernate_sequence").uniqueResult();
+
+			return id;
 
 		} catch (RuntimeException erro) {
 			throw erro;

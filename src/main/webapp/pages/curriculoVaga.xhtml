@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	template="/pages/principal.xhtml">
+
+	<ui:define name="conteudo">
+		<h:form id="formListagem">
+			<p:panel header="Vagas Disponíveis">
+
+				<p:growl id="messages" showDetail="true" />
+				<p:toolbar id="tool">
+					<f:facet name="left">
+						<p:commandButton value="Candidata-se a Vaga"
+							disabled="#{curriculoVagaBean.vagaPerfil == null}"
+							update=":formVaga :formVaga:painel"
+							oncomplete="PF('dialogoVaga').show()" icon="ui-icon-document">
+							<f:actionListener
+								type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+						</p:commandButton>
+					</f:facet>
+				</p:toolbar>
+
+				<p:dataTable id="tabela"
+					emptyMessage="Nenhuma Vaga disponível no momento."
+					selectionMode="single" selection="#{curriculoVagaBean.vagaPerfil}"
+					draggableColumns="true" resizableColumns="true"
+					rowKey="#{vagaPerfil.codigo}" paginator="true"
+					rowsPerPageTemplate="5,10,20,30,40,50,100,150,200,250,300,350,400,450,500,1000"
+					value="#{curriculoVagaBean.vagasDisponiveis}"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					var="vagaPerfil" rows="10" paginatorPosition="bottom">
+
+					<p:ajax event="rowDblselect"
+						listener="#{curriculoVagaBean.duploClique}"
+						update=":formVaga :formVaga:painel" />
+
+					<p:ajax event="rowUnselect"
+						update=":formListagem:messages :formListagem:tool"
+						listener="#{curriculoVagaBean.onRowUnselect}" />
+
+					<p:ajax event="rowSelect"
+						update=":formListagem:messages :formListagem:tool"
+						listener="#{curriculoVagaBean.onRowSelect}" />
+
+					<p:column headerText="Vaga" sortBy="#{vagaPerfil.perfil.nome}"
+						width="300">
+						<h:outputText value="#{vagaPerfil.perfil.nome}" />
+					</p:column>
+
+					<p:column headerText="Período Inicial" width="100"
+						style="text-align:center" sortBy="#{vagaPerfil.vaga.dataInicial}">
+						<h:outputText value="#{vagaPerfil.vaga.dataInicial}">
+							<f:convertDateTime locale="pt_BR" pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="Período Inicial" width="100"
+						style="text-align:center" sortBy="#{vagaPerfil.vaga.dataFinal}">
+						<h:outputText value="#{vagaPerfil.vaga.dataFinal}">
+							<f:convertDateTime locale="pt_BR" pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="Nº de Vagas" style="text-align:center"
+						width="90" sortBy="#{vagaPerfil.quantidadeVagaFormatada}">
+						<h:outputText value="#{vagaPerfil.quantidadeVagaFormatada}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:confirmDialog global="true">
+					<p:commandButton value="Sim" type="button"
+						styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+					<p:commandButton value="Não" type="button"
+						styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+				</p:confirmDialog>
+			</p:panel>
+
+		</h:form>
+
+		<p:dialog header="Vaga" widgetVar="dialogoVaga" width="800"
+			height="600" draggable="false" resizable="false" closable="true">
+			<h:form id="formVaga">
+
+				<p:accordionPanel id="painel">
+
+					<p:tab title="Detalhes da Vaga">
+						<h:panelGrid columns="1">
+							<h:outputText
+								value="Descrição: #{curriculoVagaBean.vagaPerfil.perfil.nome}" />
+
+							<h:outputText
+								value="Nº de Vagas: #{curriculoVagaBean.vagaPerfil.quantidadeVagaFormatada}" />
+
+							<h:outputText
+								value="Renumeração: #{curriculoVagaBean.vagaPerfil.renumeracaoFormatada}">
+								<f:convertNumber locale="pt_BR" minFractionDigits="2" />
+							</h:outputText>
+
+						</h:panelGrid>
+					</p:tab>
+
+					<p:tab title="Função">
+						<h:outputText value="#{curriculoVagaBean.vagaPerfil.funcao}" />
+					</p:tab>
+
+					<p:tab title="Requisitos">
+						<h:outputText value="#{curriculoVagaBean.vagaPerfil.requisitos}" />
+					</p:tab>
+
+					<p:tab title="Conhecimentos Desejáveis">
+						<h:outputText value="#{curriculoVagaBean.vagaPerfil.desejavel}" />
+					</p:tab>
+
+				</p:accordionPanel>
+
+				<br></br>
+				<p:separator />
+
+				<h:panelGrid columns="3">
+					<p:commandButton value="Candidata-se" icon="ui-icon-disk"
+						actionListener="#{curriculoVagaBean.candidatar}"
+						onstart="PF('iconeDeProcessamento').show()"
+						onsuccess="PF('iconeDeProcessamento').hide()"
+						update=":formListagem:messages">
+
+						<p:confirm header="Confirmação"
+							message="Deseja Candidata-se a essa Vaga?" icon="ui-icon-alert" />
+					</p:commandButton>
+
+					<p:commandButton value="Cancelar" icon="fa fa-fw fa-close"
+						oncomplete="PF('dialogoVaga').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+	</ui:define>
+</ui:composition>

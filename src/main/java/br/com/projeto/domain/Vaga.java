@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -26,6 +28,14 @@ public class Vaga extends GenericDomain {
 
 	@Column(nullable = false)
 	private Boolean ativo;
+
+	@ManyToOne
+	@JoinColumn(nullable = false)
+	private Etapa etapaInicial;
+
+	@Column(nullable = false)
+	@Temporal(TemporalType.DATE)
+	private Date dataResultadoEtapa;
 
 	public String getNome() {
 		return nome;
@@ -57,6 +67,22 @@ public class Vaga extends GenericDomain {
 
 	public void setAtivo(Boolean ativo) {
 		this.ativo = ativo;
+	}
+
+	public Etapa getEtapaInicial() {
+		return etapaInicial;
+	}
+
+	public void setEtapaInicial(Etapa etapaInicial) {
+		this.etapaInicial = etapaInicial;
+	}
+
+	public Date getDataResultadoEtapa() {
+		return dataResultadoEtapa;
+	}
+
+	public void setDataResultadoEtapa(Date dataResultadoEtapa) {
+		this.dataResultadoEtapa = dataResultadoEtapa;
 	}
 
 	@Transient

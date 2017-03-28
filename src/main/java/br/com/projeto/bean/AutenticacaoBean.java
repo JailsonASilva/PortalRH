@@ -218,6 +218,8 @@ public class AutenticacaoBean {
 		CurriculoDAO curriculoDAO = new CurriculoDAO();
 		curriculoDAO.merge(curriculo);
 
+		curriculo = curriculoDAO.localizarCurriculo(curriculo.getCpf());
+
 		curriculoAcademico = new CurriculoAcademico();
 		curriculoAcademico.setCurriculo(curriculo);
 	}
@@ -225,6 +227,8 @@ public class AutenticacaoBean {
 	public void novoCurso() {
 		CurriculoDAO curriculoDAO = new CurriculoDAO();
 		curriculoDAO.merge(curriculo);
+
+		curriculo = curriculoDAO.localizarCurriculo(curriculo.getCpf());
 
 		curriculoCurso = new CurriculoCurso();
 		curriculoCurso.setCurriculo(curriculo);
@@ -234,6 +238,8 @@ public class AutenticacaoBean {
 		CurriculoDAO curriculoDAO = new CurriculoDAO();
 		curriculoDAO.merge(curriculo);
 
+		curriculo = curriculoDAO.localizarCurriculo(curriculo.getCpf());
+
 		curriculoProfissional = new CurriculoProfissional();
 		curriculoProfissional.setCurriculo(curriculo);
 	}
@@ -241,6 +247,8 @@ public class AutenticacaoBean {
 	public void novoPessoal() {
 		CurriculoDAO curriculoDAO = new CurriculoDAO();
 		curriculoDAO.merge(curriculo);
+
+		curriculo = curriculoDAO.localizarCurriculo(curriculo.getCpf());
 
 		curriculoPessoal = new CurriculoPessoal();
 		curriculoPessoal.setCurriculo(curriculo);
@@ -256,10 +264,11 @@ public class AutenticacaoBean {
 				return;
 			}
 
-			Faces.redirect("./pages/principal.xhtml");
+			Faces.redirect("./pages/curriculoVaga.xhtml");
 
 		} catch (IOException erro) {
 			erro.printStackTrace();
+
 			Messages.addGlobalError("Não foi possível Realizar a Autenticação. Erro: " + erro.getMessage());
 		}
 	}
@@ -315,6 +324,7 @@ public class AutenticacaoBean {
 
 		} catch (Exception erro) {
 			erro.printStackTrace();
+
 			Messages.addGlobalError("Ocorreu um Erro ao Tentar Enviar a Nova Senha: " + erro.getMessage());
 		}
 
@@ -333,24 +343,25 @@ public class AutenticacaoBean {
 					+ "Esta mensagem foi enviada por um sistema automático. Favor, não respondê-la.";
 
 			CurriculoDAO curriculoDAO = new CurriculoDAO();
-
-			Curriculo curriculo = curriculoDAO.pesquisarCPF(cpf);
+			curriculo = curriculoDAO.localizarCurriculo(curriculo.getCpf());
 
 			if (curriculo == null) {
 				FacesContext context = FacesContext.getCurrentInstance();
 
-				context.addMessage(null, new FacesMessage("Aviso!", "CPF não Encontrado!"));
+				context.addMessage(null,
+						new FacesMessage("Ocorreu um Erro!", "Não foi possível identificar o Currículo."));
 				return;
 			}
 
 			curriculo.setSenha(hash.toHex());
-
 			curriculoDAO.merge(curriculo);
 
-			EmailUtils.enviaEmail("Currículo Online - Nova senha", mensagem, curriculo.getEmail());
+			EmailUtils.enviaEmail("Currículo Online - Senha de Acesso", mensagem, curriculo.getEmail());
 
-			Messages.addGlobalInfo(
-					"Currículo Salvo com Sucesso! Para efetuar o login no sistema use o seu CPF e a senha foi enviada para o e-mail cadastrado.");
+			FacesContext context = FacesContext.getCurrentInstance();
+
+			context.addMessage(null, new FacesMessage("Currículo Salvo com Sucesso!",
+					"Para efetuar o login no sistema use o seu CPF e sua senha de acesso foi enviada para o e-mail cadastrado"));
 
 			org.primefaces.context.RequestContext.getCurrentInstance().execute("PF('dialogoSenha').hide();");
 
@@ -402,7 +413,7 @@ public class AutenticacaoBean {
 
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocorreu um Erro ao Tentar Salvar este Registro.",
-					"Erro: " + erro.getMessage());
+					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();
@@ -427,7 +438,8 @@ public class AutenticacaoBean {
 
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR,
-					"Ocorreu um Erro ao Tentar Salvar Dados Acadêmico este Registro.", "Erro: " + erro.getMessage());
+					"Ocorreu um Erro ao Tentar Salvar Dados Acadêmico este Registro.",
+					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();
@@ -451,7 +463,8 @@ public class AutenticacaoBean {
 
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR,
-					"Ocorreu um Erro ao Tentar Salvar Dados do Curso este Registro.", "Erro: " + erro.getMessage());
+					"Ocorreu um Erro ao Tentar Salvar Dados do Curso este Registro.",
+					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();
@@ -476,7 +489,7 @@ public class AutenticacaoBean {
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR,
 					"Ocorreu um Erro ao Tentar Salvar Dados Profissionais este Registro.",
-					"Erro: " + erro.getMessage());
+					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();
@@ -500,7 +513,8 @@ public class AutenticacaoBean {
 
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR,
-					"Ocorreu um Erro ao Tentar Salvar Dados Pessoais este Registro.", "Erro: " + erro.getMessage());
+					"Ocorreu um Erro ao Tentar Salvar Dados Pessoais este Registro.",
+					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();
@@ -524,7 +538,7 @@ public class AutenticacaoBean {
 
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocorreu um Erro ao Tentar Excluir este Registro.",
-					"Erro: " + erro.getMessage());
+					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();
@@ -547,7 +561,7 @@ public class AutenticacaoBean {
 
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocorreu um Erro ao Tentar Excluir este Registro.",
-					"Erro: " + erro.getMessage());
+					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();
@@ -569,7 +583,7 @@ public class AutenticacaoBean {
 
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocorreu um Erro ao Tentar Excluir este Registro.",
-					"Erro: " + erro.getMessage());
+					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();
@@ -592,7 +606,7 @@ public class AutenticacaoBean {
 
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocorreu um Erro ao Tentar Excluir este Registro.",
-					"Erro: " + erro.getMessage());
+					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();
@@ -615,7 +629,7 @@ public class AutenticacaoBean {
 
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocorreu um Erro ao Tentar Excluir este Registro.",
-					"Erro: " + erro.getMessage());
+					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();
@@ -629,7 +643,8 @@ public class AutenticacaoBean {
 
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR,
-					"Ocorreu um Erro ao Tentar Selecionar este Registro.", "Erro Inesperado!");
+					"Ocorreu um Erro ao Tentar Selecionar este Registro.",
+					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();
@@ -656,7 +671,8 @@ public class AutenticacaoBean {
 
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR,
-					"Ocorreu um Erro ao Tentar Selecionar este Registro.", "Erro Inesperado!");
+					"Ocorreu um Erro ao Tentar Selecionar este Registro.",
+					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();
@@ -670,7 +686,8 @@ public class AutenticacaoBean {
 
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR,
-					"Ocorreu um Erro ao Tentar Selecionar este Registro.", "Erro Inesperado!");
+					"Ocorreu um Erro ao Tentar Selecionar este Registro.",
+					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();
@@ -685,7 +702,7 @@ public class AutenticacaoBean {
 
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocorreu um Erro ao Tentar Selecionar Registro.",
-					"Erro Inesperado!");
+					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();
@@ -699,7 +716,7 @@ public class AutenticacaoBean {
 
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocorreu um Erro ao Tentar Selecionar Registro.",
-					"Erro Inesperado!");
+					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();
@@ -712,7 +729,7 @@ public class AutenticacaoBean {
 
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocorreu um Erro ao Tentar Selecionar Registro.",
-					"Erro Inesperado!");
+					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();
@@ -725,7 +742,7 @@ public class AutenticacaoBean {
 
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocorreu um Erro ao Tentar Selecionar Registro.",
-					"Erro Inesperado!");
+					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();
@@ -738,7 +755,7 @@ public class AutenticacaoBean {
 
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocorreu um Erro ao Tentar Selecionar Registro.",
-					"Erro Inesperado!");
+					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();

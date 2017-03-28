@@ -116,7 +116,7 @@
 					<p:commandButton value="Enviar Nova Senha"
 						icon="fa fa fw fa-envelope-o"
 						actionListener="#{autenticacaoBean.enviarNovaSenha}"
-						update="formSenha:painel messages"
+						update="formSenha:painel :messages"
 						onstart="PF('iconeDeProcessamento').show()"
 						onsuccess="PF('iconeDeProcessamento').hide()" />
 

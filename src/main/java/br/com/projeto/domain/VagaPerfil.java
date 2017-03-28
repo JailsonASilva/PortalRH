@@ -20,7 +20,22 @@ public class VagaPerfil extends GenericDomain {
 	private Perfil perfil;
 
 	@Column(nullable = false)
+	private Long quantidadeVaga;
+
+	@Column(nullable = false)
 	private Boolean ativo;
+
+	@Column(nullable = false, length = 2000)
+	private String funcao;
+
+	@Column(nullable = false, length = 2000)
+	private String requisitos;
+
+	@Column(nullable = false, length = 2000)
+	private String desejavel;
+
+	@Column(nullable = false, precision = 6, scale = 2)
+	private double renumeracao;
 
 	public Vaga getVaga() {
 		return vaga;
@@ -38,12 +53,78 @@ public class VagaPerfil extends GenericDomain {
 		this.perfil = perfil;
 	}
 
+	public Long getQuantidadeVaga() {
+		return quantidadeVaga;
+	}
+
+	public void setQuantidadeVaga(Long quantidadeVaga) {
+		this.quantidadeVaga = quantidadeVaga;
+	}
+
 	public Boolean getAtivo() {
 		return ativo;
 	}
 
 	public void setAtivo(Boolean ativo) {
 		this.ativo = ativo;
+	}
+
+	public String getFuncao() {
+		return funcao;
+	}
+
+	public void setFuncao(String funcao) {
+		this.funcao = funcao;
+	}
+
+	public String getRequisitos() {
+		return requisitos;
+	}
+
+	public void setRequisitos(String requisitos) {
+		this.requisitos = requisitos;
+	}
+
+	public String getDesejavel() {
+		return desejavel;
+	}
+
+	public void setDesejavel(String desejavel) {
+		this.desejavel = desejavel;
+	}
+
+	public double getRenumeracao() {
+		return renumeracao;
+	}
+
+	public void setRenumeracao(double renumeracao) {
+		this.renumeracao = renumeracao;
+	}
+
+	@Transient
+	public String getRenumeracaoFormatada() {
+		String renumeracaoFormatada;
+
+		if (renumeracao <= 0) {
+			renumeracaoFormatada = "Não Informada";
+		} else {
+			renumeracaoFormatada = String.valueOf(renumeracao) + "0";
+		}
+
+		return renumeracaoFormatada;
+	}
+
+	@Transient
+	public String getQuantidadeVagaFormatada() {
+		String QuantidadeVagaFormatada;
+
+		if (quantidadeVaga <= 0L) {
+			QuantidadeVagaFormatada = "Não Informada";
+		} else {
+			QuantidadeVagaFormatada = String.valueOf(quantidadeVaga);
+		}
+
+		return QuantidadeVagaFormatada;
 	}
 
 	@Transient
@@ -56,4 +137,5 @@ public class VagaPerfil extends GenericDomain {
 
 		return ativoFormatado;
 	}
+
 }

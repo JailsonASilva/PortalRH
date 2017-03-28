@@ -13,7 +13,7 @@
 		<p:dialog header="Trocar de Senha" widgetVar="dialogo" visible="true"
 			draggable="false" resizable="false" closable="true">
 			<h:form id="formCadastro">
-				<h:panelGrid id="painel" columns="2" class="ui-noborder">
+				<h:panelGrid id="painel" columns="1" class="ui-noborder">
 
 					<p:outputLabel for="novaSenha" value="Nova Senha" />
 					<p:password id="novaSenha" maxlength="100" size="35"
@@ -35,7 +35,7 @@
 						onstart="PF('iconeDeProcessamento').show()"
 						onsuccess="PF('iconeDeProcessamento').hide()" />
 
-					<p:commandButton value="Fechar" icon="fa fa-fw fa-close"
+					<p:commandButton value="Cancelar" icon="fa fa-fw fa-close"
 						oncomplete="PF('dialogo').hide();" />
 				</h:panelGrid>
 			</h:form>
