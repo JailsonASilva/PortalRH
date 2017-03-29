@@ -7,26 +7,29 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 
+import org.apache.commons.mail.EmailException;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Messages;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
 
-import br.com.projeto.dao.CurriculoVagaDAO;
 import br.com.projeto.dao.VagaPerfilDAO;
 import br.com.projeto.domain.Curriculo;
 import br.com.projeto.domain.CurriculoVaga;
 import br.com.projeto.domain.VagaPerfil;
+import br.com.projeto.util.EmailUtils;
 
 @SuppressWarnings("serial")
 @ManagedBean
 @ViewScoped
-public class CurriculoVagaBean implements Serializable {
-	
+public class IndicarAmigoBean implements Serializable {
 	private CurriculoVaga curriculoVaga;
 	private FacesMessage message;
+
+	private String email;
 
 	private VagaPerfil vagaPerfil;
 	private List<VagaPerfil> vagasDisponiveis;
@@ -63,6 +66,14 @@ public class CurriculoVagaBean implements Serializable {
 		this.vagaPerfil = vagaPerfil;
 	}
 
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 	@PostConstruct
 	public void inicializar() {
 		try {
@@ -71,8 +82,7 @@ public class CurriculoVagaBean implements Serializable {
 
 		} catch (Exception erro) {
 			erro.printStackTrace();
-			Messages.addGlobalError(
-					"Não foi possível Listar as Vagas Disponíveis. Erro: " + erro.getMessage());
+			Messages.addGlobalError("Não foi possível Listar as Vagas Disponíveis. Erro: " + erro.getMessage());
 		}
 	}
 
@@ -97,45 +107,28 @@ public class CurriculoVagaBean implements Serializable {
 		vagaPerfil = null;
 	}
 
-	public void candidatar() {
+	public void indicar() throws EmailException {
 		try {
 			AutenticacaoBean autenticacaoBean = Faces.getSessionAttribute("autenticacaoBean");
 			Curriculo curriculo = autenticacaoBean.getUsuarioLogado();
 
-			CurriculoVagaDAO curriculoVagaDAO = new CurriculoVagaDAO();
+			String mensagem = "Olá! Tudo Bem?" + "\n" + "\n" + curriculo.getNome() + " lhe indicou uma vaga de "
+					+ vagaPerfil.getPerfil().getNome()
+					+ ", para participar do processo seletivo acesse wwww.facema.edu.br." + "\n" + "\n" + "" + "\n"
+					+ "Atenciosamente, " + "\n" + "" + "\n" + "Faculdade de Ciências e Tecnologia do Maranhão" + "\n"
+					+ "" + "Fone: (99) 3422-6800" + "\n" + "" + "\n"
+					+ "Esta mensagem foi enviada por um sistema automático. Favor, não respondê-la.";
 
-			if (curriculoVagaDAO.verificarDuplicidade(curriculo.getCodigo(), vagaPerfil.getCodigo()) == true) {
+			EmailUtils.enviaEmail("Indicação Vaga - Facema", mensagem, email);
 
-				message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Aviso!",
-						"Operação não Permitida! Você não pode candidatar-se a mesma vaga.");
+			FacesContext context = FacesContext.getCurrentInstance();
 
-				RequestContext.getCurrentInstance().showMessageInDialog(message);
-
-				return;
-			}
-
-			curriculoVaga = new CurriculoVaga();
-
-			curriculoVaga.setCurriculo(curriculo);
-			curriculoVaga.setStatus("Em andamento");
-			curriculoVaga.setVagaPerfil(vagaPerfil);
-			curriculoVaga.setDataInicial(vagaPerfil.getVaga().getDataInicial());
-			curriculoVaga.setDataFinal(vagaPerfil.getVaga().getDataFinal());
-			curriculoVaga.setEtapa(vagaPerfil.getVaga().getEtapaInicial());
-			curriculoVaga.setDataResultado(vagaPerfil.getVaga().getDataResultadoEtapa());
-			curriculoVaga.setRetornoRH("Aguarde... Em breve entraremos em contato");
-
-			curriculoVagaDAO.merge(curriculoVaga);
-
-			message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Parabéns!",
-					"Parabéns você candidatou-se a essa Vaga com Sucesso! Para acompanhar sua seleção acesse o menu 'Acompanhar Seleção'.");
-
-			RequestContext.getCurrentInstance().showMessageInDialog(message);
+			context.addMessage(null, new FacesMessage("Enviado com Sucesso!", "Indicação feita com Sucesso!"));
 
 			org.primefaces.context.RequestContext.getCurrentInstance().execute("PF('dialogoVaga').hide();");
 
 		} catch (RuntimeException erro) {
-			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocorreu um Erro ao Tentar Candidata-se a Vaga.",
+			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocorreu um Erro ao Tentar Indicar a Vaga.",
 					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);

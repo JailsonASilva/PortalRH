@@ -10,15 +10,15 @@
 
 	<ui:define name="conteudo">
 		<h:form id="formListagem">
-			<p:panel header="Vagas Disponíveis">
+			<p:panel header="Indicar a um Amigo">
 
 				<p:growl id="messages" showDetail="true" />
 				<p:toolbar id="tool">
 					<f:facet name="left">
-						<p:commandButton value="Candidata-se a Vaga"
-							disabled="#{curriculoVagaBean.vagaPerfil == null}"
+						<p:commandButton value="Indicar"
+							disabled="#{indicarAmigoBean.vagaPerfil == null}"
 							update=":formVaga :formVaga:painel"
-							oncomplete="PF('dialogoVaga').show()" icon="fa fa fw fa-list-alt">
+							oncomplete="PF('dialogoVaga').show()" icon="ui-icon-document">
 							<f:actionListener
 								type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
 						</p:commandButton>
@@ -27,25 +27,25 @@
 
 				<p:dataTable id="tabela"
 					emptyMessage="Nenhuma Vaga disponível no momento."
-					selectionMode="single" selection="#{curriculoVagaBean.vagaPerfil}"
+					selectionMode="single" selection="#{indicarAmigoBean.vagaPerfil}"
 					draggableColumns="true" resizableColumns="true"
 					rowKey="#{vagaPerfil.codigo}" paginator="true"
 					rowsPerPageTemplate="5,10,20,30,40,50,100,150,200,250,300,350,400,450,500,1000"
-					value="#{curriculoVagaBean.vagasDisponiveis}"
+					value="#{indicarAmigoBean.vagasDisponiveis}"
 					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 					var="vagaPerfil" rows="10" paginatorPosition="bottom">
 
 					<p:ajax event="rowDblselect"
-						listener="#{curriculoVagaBean.duploClique}"
+						listener="#{indicarAmigoBean.duploClique}"
 						update=":formVaga :formVaga:painel" />
 
 					<p:ajax event="rowUnselect"
 						update=":formListagem:messages :formListagem:tool"
-						listener="#{curriculoVagaBean.onRowUnselect}" />
+						listener="#{indicarAmigoBean.onRowUnselect}" />
 
 					<p:ajax event="rowSelect"
 						update=":formListagem:messages :formListagem:tool"
-						listener="#{curriculoVagaBean.onRowSelect}" />
+						listener="#{indicarAmigoBean.onRowSelect}" />
 
 					<p:column headerText="Vaga" sortBy="#{vagaPerfil.perfil.nome}"
 						width="300">
@@ -91,13 +91,13 @@
 					<p:tab title="Detalhes da Vaga">
 						<h:panelGrid columns="1">
 							<h:outputText
-								value="Descrição: #{curriculoVagaBean.vagaPerfil.perfil.nome}" />
+								value="Descrição: #{indicarAmigoBean.vagaPerfil.perfil.nome}" />
 
 							<h:outputText
-								value="Nº de Vagas: #{curriculoVagaBean.vagaPerfil.quantidadeVagaFormatada}" />
+								value="Nº de Vagas: #{indicarAmigoBean.vagaPerfil.quantidadeVagaFormatada}" />
 
 							<h:outputText
-								value="Renumeração: #{curriculoVagaBean.vagaPerfil.renumeracaoFormatada}">
+								value="Renumeração: #{indicarAmigoBean.vagaPerfil.renumeracaoFormatada}">
 								<f:convertNumber locale="pt_BR" minFractionDigits="2" />
 							</h:outputText>
 
@@ -105,15 +105,15 @@
 					</p:tab>
 
 					<p:tab title="Função">
-						<h:outputText value="#{curriculoVagaBean.vagaPerfil.funcao}" />
+						<h:outputText value="#{indicarAmigoBean.vagaPerfil.funcao}" />
 					</p:tab>
 
 					<p:tab title="Requisitos">
-						<h:outputText value="#{curriculoVagaBean.vagaPerfil.requisitos}" />
+						<h:outputText value="#{indicarAmigoBean.vagaPerfil.requisitos}" />
 					</p:tab>
 
 					<p:tab title="Conhecimentos Desejáveis">
-						<h:outputText value="#{curriculoVagaBean.vagaPerfil.desejavel}" />
+						<h:outputText value="#{indicarAmigoBean.vagaPerfil.desejavel}" />
 					</p:tab>
 
 				</p:accordionPanel>
@@ -121,15 +121,24 @@
 				<br></br>
 				<p:separator />
 
-				<h:panelGrid columns="3">
-					<p:commandButton value="Candidata-se" icon="ui-icon-disk"
-						actionListener="#{curriculoVagaBean.candidatar}"
+				<br></br>
+				<br></br>
+
+				<h:panelGrid columns="4" id="painel2">
+
+					<p:outputLabel for="email" value="E-mail do Amigo" />
+					<p:inputText id="email" maxlength="100" size="50" required="true"
+						requiredMessage="Campo Obrigatório"
+						value="#{indicarAmigoBean.email}" />
+
+					<p:commandButton value="Indicar" icon="ui-icon-check"
+						actionListener="#{indicarAmigoBean.indicar}"
 						onstart="PF('iconeDeProcessamento').show()"
 						onsuccess="PF('iconeDeProcessamento').hide()"
-						update=":formListagem:messages">
+						update=":formListagem:messages formVaga:painel2">
 
 						<p:confirm header="Confirmação"
-							message="Deseja Candidata-se a essa Vaga?" icon="ui-icon-alert" />
+							message="Deseja Indicar esta Vaga?" icon="ui-icon-alert" />
 					</p:commandButton>
 
 					<p:commandButton value="Cancelar" icon="fa fa-fw fa-close"

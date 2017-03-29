@@ -20,13 +20,17 @@ import org.primefaces.event.UnselectEvent;
 import br.com.projeto.dao.CurriculoAcademicoDAO;
 import br.com.projeto.dao.CurriculoCursoDAO;
 import br.com.projeto.dao.CurriculoDAO;
+import br.com.projeto.dao.CurriculoPerfilDAO;
 import br.com.projeto.dao.CurriculoPessoalDAO;
 import br.com.projeto.dao.CurriculoProfissionalDAO;
+import br.com.projeto.dao.PerfilDAO;
 import br.com.projeto.domain.Curriculo;
 import br.com.projeto.domain.CurriculoAcademico;
 import br.com.projeto.domain.CurriculoCurso;
+import br.com.projeto.domain.CurriculoPerfil;
 import br.com.projeto.domain.CurriculoPessoal;
 import br.com.projeto.domain.CurriculoProfissional;
+import br.com.projeto.domain.Perfil;
 
 @SuppressWarnings("serial")
 @ManagedBean
@@ -46,6 +50,11 @@ public class CurriculoBean implements Serializable {
 
 	private CurriculoPessoal curriculoPessoal;
 	private List<CurriculoPessoal> curriculoPessoais;
+
+	private CurriculoPerfil curriculoPerfil;
+	private List<CurriculoPerfil> curriculoPerfis;
+
+	private List<Perfil> perfis;
 
 	private FacesMessage message;
 	private String busca;
@@ -164,6 +173,30 @@ public class CurriculoBean implements Serializable {
 		this.cpf = cpf;
 	}
 
+	public CurriculoPerfil getCurriculoPerfil() {
+		return curriculoPerfil;
+	}
+
+	public void setCurriculoPerfil(CurriculoPerfil curriculoPerfil) {
+		this.curriculoPerfil = curriculoPerfil;
+	}
+
+	public List<CurriculoPerfil> getCurriculoPerfis() {
+		return curriculoPerfis;
+	}
+
+	public void setCurriculoPerfis(List<CurriculoPerfil> curriculoPerfis) {
+		this.curriculoPerfis = curriculoPerfis;
+	}
+
+	public List<Perfil> getPerfis() {
+		return perfis;
+	}
+
+	public void setPerfis(List<Perfil> perfis) {
+		this.perfis = perfis;
+	}
+
 	@PostConstruct
 	public void localizar() {
 		try {
@@ -191,6 +224,8 @@ public class CurriculoBean implements Serializable {
 			listarCurriculoCurso();
 			listarCurriculoProfissional();
 			listarCurriculoPessoal();
+			listarCurriculoPerfil();
+			listarPerfis();
 
 		} catch (
 
@@ -244,6 +279,14 @@ public class CurriculoBean implements Serializable {
 
 		curriculoPessoal = new CurriculoPessoal();
 		curriculoPessoal.setCurriculo(curriculo);
+	}
+
+	public void novoPerfil() {
+		CurriculoDAO curriculoDAO = new CurriculoDAO();
+		curriculoDAO.merge(curriculo);
+
+		curriculoPerfil = new CurriculoPerfil();
+		curriculoPerfil.setCurriculo(curriculo);
 	}
 
 	public void listarCurriculoAcademico() {
@@ -310,6 +353,40 @@ public class CurriculoBean implements Serializable {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR,
 					"Ocorreu um Erro ao Tentar Listar Referências Pessoais.",
 					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
+
+			RequestContext.getCurrentInstance().showMessageInDialog(message);
+
+			erro.printStackTrace();
+		}
+	}
+
+	public void listarCurriculoPerfil() {
+		try {
+			CurriculoPerfilDAO curriculoPerfilDAO = new CurriculoPerfilDAO();
+			curriculoPerfis = curriculoPerfilDAO.listarCurriculoPerfil(curriculo.getCodigo());
+
+		} catch (
+
+		RuntimeException erro) {
+			message = new FacesMessage(FacesMessage.SEVERITY_ERROR,
+					"Ocorreu um Erro ao Tentar Listar Referências Pessoais.", "Erro: " + erro.getMessage());
+
+			RequestContext.getCurrentInstance().showMessageInDialog(message);
+
+			erro.printStackTrace();
+		}
+	}
+
+	public void listarPerfis() {
+		try {
+			PerfilDAO perfilDAO = new PerfilDAO();
+			perfis = perfilDAO.listar("nome");
+
+		} catch (
+
+		RuntimeException erro) {
+			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocorreu um Erro ao Tentar Listar Perfis.",
+					"Erro: " + erro.getMessage());
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 
@@ -438,6 +515,30 @@ public class CurriculoBean implements Serializable {
 		}
 	}
 
+	public void salvarCurriculoPerfil() {
+		try {
+			CurriculoPerfilDAO curriculoPerfilDAO = new CurriculoPerfilDAO();
+			curriculoPerfilDAO.merge(curriculoPerfil);
+
+			org.primefaces.context.RequestContext.getCurrentInstance().execute("PF('dialogoPerfil').hide();");
+
+			FacesContext context = FacesContext.getCurrentInstance();
+
+			context.addMessage(null, new FacesMessage("Aviso!", "Dados do Perfil Salvo com Sucesso!"));
+
+			listarCurriculoPerfil();
+
+			curriculoPerfil = null;
+
+		} catch (RuntimeException erro) {
+			message = new FacesMessage(FacesMessage.SEVERITY_ERROR,
+					"Ocorreu um Erro ao Tentar Salvar Dados Perfil este Registro.", "Erro: " + erro.getMessage());
+
+			RequestContext.getCurrentInstance().showMessageInDialog(message);
+			erro.printStackTrace();
+		}
+	}
+
 	public void excluir(ActionEvent evento) {
 		try {
 			CurriculoDAO curriculoDAO = new CurriculoDAO();
@@ -553,6 +654,28 @@ public class CurriculoBean implements Serializable {
 		}
 	}
 
+	public void excluirCurriculoPerfil(ActionEvent evento) {
+		try {
+			curriculoPerfil = (CurriculoPerfil) evento.getComponent().getAttributes().get("curriculoPerfilSelecionado");
+
+			CurriculoPerfilDAO curriculoPerfilDAO = new CurriculoPerfilDAO();
+			curriculoPerfilDAO.excluir(curriculoPerfil);
+
+			FacesContext context = FacesContext.getCurrentInstance();
+
+			context.addMessage(null, new FacesMessage("Exclusão!", "Dados Perfil Excluído com Sucesso!"));
+
+			curriculoPerfis = curriculoPerfilDAO.listarCurriculoPerfil(curriculo.getCodigo());
+
+		} catch (RuntimeException erro) {
+			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocorreu um Erro ao Tentar Excluir este Registro.",
+					"Erro: " + erro.getMessage());
+
+			RequestContext.getCurrentInstance().showMessageInDialog(message);
+			erro.printStackTrace();
+		}
+	}
+
 	public void editarCurriculoAcademico(ActionEvent evento) {
 		try {
 			curriculoAcademico = (CurriculoAcademico) evento.getComponent().getAttributes()
@@ -606,6 +729,19 @@ public class CurriculoBean implements Serializable {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR,
 					"Ocorreu um Erro ao Tentar Selecionar este Registro.",
 					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
+
+			RequestContext.getCurrentInstance().showMessageInDialog(message);
+			erro.printStackTrace();
+		}
+	}
+
+	public void editarCurriculoPerfil(ActionEvent evento) {
+		try {
+			curriculoPerfil = (CurriculoPerfil) evento.getComponent().getAttributes().get("curriculoPerfilSelecionado");
+
+		} catch (RuntimeException erro) {
+			message = new FacesMessage(FacesMessage.SEVERITY_ERROR,
+					"Ocorreu um Erro ao Tentar Selecionar este Registro.", "Erro Inesperado!");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();
@@ -674,6 +810,19 @@ public class CurriculoBean implements Serializable {
 		} catch (RuntimeException erro) {
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocorreu um Erro ao Tentar Selecionar Registro.",
 					"Erro Inesperado! Favor comunicar o RH: (99) 3422-6800 Ramal 845");
+
+			RequestContext.getCurrentInstance().showMessageInDialog(message);
+			erro.printStackTrace();
+		}
+	}
+	
+	public void duploCliquePerfil(SelectEvent evento) {
+		try {
+			org.primefaces.context.RequestContext.getCurrentInstance().execute("PF('dialogoPerfil').show();");
+
+		} catch (RuntimeException erro) {
+			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ocorreu um Erro ao Tentar Selecionar Registro.",
+					"Erro Inesperado!");
 
 			RequestContext.getCurrentInstance().showMessageInDialog(message);
 			erro.printStackTrace();

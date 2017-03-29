@@ -51,6 +51,7 @@
 		<mapping class="br.com.projeto.domain.CurriculoPessoal" />
 		<mapping class="br.com.projeto.domain.CurriculoVaga" />
 		<mapping class="br.com.projeto.domain.Etapa" />
+		<mapping class="br.com.projeto.domain.CurriculoPerfil" />
 
 	</session-factory>
 
